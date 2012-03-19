@@ -1,0 +1,238 @@
+﻿<#@ template hostspecific="true" debug="false" language="C#" #>
+<#@ assembly name="%ProgramFiles%\Hedgehog Development\Team Development for Sitecore (VS2010)\HedgehogDevelopment.SitecoreCommon.Data.dll" #>
+<#@ assembly name="%ProgramFiles%\Hedgehog Development\Team Development for Sitecore (VS2010)\HedgehogDevelopment.SitecoreCommon.Data.Parser.dll" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="HedgehogDevelopment.SitecoreCommon.Data" #>
+<#@ import namespace="HedgehogDevelopment.SitecoreCommon.Data.Items" #>
+<#@ import namespace="HedgehogDevelopment.SitecoreCommon.Data.Fields" #>
+<#@ import namespace="System.Collections" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="System.Globalization" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Text.RegularExpressions" #>
+using System;
+using Sitecore.Data.Items;
+using Herskind.Model.Helper;
+using Herskind.Model.Helper.FieldTypes;
+ 
+<# 
+// CONFIGURE: Change this to the the path of your TDS project (relative to current project)
+string tdsPath = "..\\Herskind.Model.Tds";
+// CONFIGURE: Choose your namespace prefix
+BaseNameSpace = "Herskind.Model";
+
+SerializedTreeDataSource sitecoreDataSource = new SerializedTreeDataSource(this.Host.ResolvePath(tdsPath));
+
+foreach (var template in sitecoreDataSource.Templates)
+{    
+	var baseTemplates = BaseTemplateList(template, sitecoreDataSource, false);
+	var baseTemplatesRecursive = BaseTemplateList(template, sitecoreDataSource, true);
+	var combinedTemplateList = new List<TemplateItem>(baseTemplatesRecursive);
+	combinedTemplateList.Add(template);
+	
+#>
+
+#region <#= template.Name #> (<#= RelativeNamespace(template) #>)
+namespace <#= FullNamespace(template) #>
+{
+	// Template interface
+	public partial interface <#= InterfaceName(template.Name) #> : IItemWrapper <# 
+	foreach (var baseTemplate in baseTemplates)
+	{	
+		#>, <#= RelativeNamespace(baseTemplate) + "." + InterfaceName(baseTemplate.Name)  #><#
+	}
+#>
+
+	{		
+<#
+	foreach(var fieldTemplate in combinedTemplateList)
+	{		
+    	foreach(var section in fieldTemplate.Sections)
+    	{
+        	foreach(var field in section.OwnFields)
+        	{
+#>
+		<#= GetFieldWrapperType(field.Fields["type"]) #> <#= TitleCase(field.Name) #> { get; }		
+<#
+       		}
+    	}
+ 	}
+#>			
+	}
+
+	// Template class
+	[TemplateMapping("<#= template.ID.ToString("b").ToUpper() #>")]
+	public class <#= ClassName(template.Name) #> : BaseItemWrapper, <#= InterfaceName(template.Name) #>
+	{
+		private Item _innerItem = null;
+		public <#= ClassName(template.Name) #>(Item item) : base(item)
+		{
+			_innerItem = item;
+		}
+<#
+	foreach(var fieldTemplate in combinedTemplateList)
+	{		
+    	foreach(var section in fieldTemplate.Sections)
+    	{
+        	foreach(var field in section.OwnFields)
+        	{
+#>
+
+		public <#= GetFieldWrapperType(field.Fields["type"]) #> <#= TitleCase(field.Name) #>
+		{
+			get 
+			{
+				return (<#= GetFieldWrapperType(field.Fields["type"]) #>)GetField("<#= field.Name.ToLower() #>"); 
+			} 
+		} 	
+<#
+       		}
+    	}
+ 	}
+    
+#>
+	}
+}
+#endregion
+
+<#
+}
+#>
+<#+ 
+public string BaseNameSpace = "Herskind.Model";
+
+public string GetFieldWrapperType(string typeName)
+{
+	var wrapperType = "IFieldWrapper";
+	
+	switch (typeName.ToLower())
+    {
+        case "checkbox":
+            wrapperType = "IBooleanFieldWrapper";
+            break;
+        case "image":
+            wrapperType = "IImageFieldWrapper";
+            break;
+        case "date":
+        case "datetime":
+            wrapperType = "IDateFieldWrapper";
+            break;
+        case "checklist":
+        case "treelist":
+        case "treelistex":
+        case "multilist":
+            wrapperType = "IListFieldWrapper";
+            break;
+        case "droplink":
+        case "droptree":
+        case "general link":
+            wrapperType = "ILinkFieldWrapper";
+            break;
+        case "single-line text":
+        case "multi-line text":
+        case "rich text":
+		    wrapperType = "ITextFieldWrapper";
+            break;
+		default:
+            wrapperType = "ITextFieldWrapper";
+            break;
+    }
+
+	return wrapperType;
+}
+
+
+public string ClassName(string name)
+{
+	return TitleCase(name);
+}
+
+public string DataClassName(string name)
+{
+	return TitleCase(name) + "FieldData";
+}
+
+public string DataInterfaceName(string name)
+{
+	return "I" + TitleCase(name) + "FieldData";
+}
+
+public string DataPropertyName(string name)
+{
+	return TitleCase(name) + "Fields";
+}
+
+public string DataPrivateMemberName(string name)
+{
+	return "_m" + TitleCase(name) + "Fields";
+}
+
+public string InterfaceName(string name)
+{
+	return "I" + TitleCase(name);
+}
+
+public string TitleCase(string name)
+{
+	name = Regex.Replace(name, "([a-z](?=[A-Z])|[A-Z](?=[A-Z][a-z]))", "$1 ");
+	name = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(name);
+	name = Regex.Replace(name, @"[^a-zA-Z0-9]", String.Empty);
+	name = Regex.Replace(name, @"(^[0-9])", "Z$1");
+	
+	return name;
+}
+
+public string RelativeNamespace(TemplateItem template)
+{
+	var sb = new StringBuilder();
+	var pathList = new List<string>(template.Path.Split('/'));
+	
+	try
+	{
+		return string.Join(".", pathList.Take(pathList.Count - 1).Skip(3).Select(p => TitleCase(p)));
+	}
+	catch
+	{
+	}
+	
+	return "";
+}
+
+public string FullNamespace(TemplateItem template)
+{
+	return BaseNameSpace + "." + RelativeNamespace(template);
+}
+
+public IEnumerable<TemplateItem> BaseTemplateList(TemplateItem template, SerializedTreeDataSource sitecoreDataSource, bool recursive)
+{
+	var list = new List<TemplateItem>();
+	
+	foreach (var templateId in template.BaseTemplateIds)
+	{
+		var baseTemplates = sitecoreDataSource.Templates.Where(t => t.ID.Equals(templateId));
+		if (baseTemplates.Count() == 1)
+		{
+			if (!list.Where(t => t.ID == baseTemplates.First().ID).Any())
+			{
+				list.Add(baseTemplates.First());
+				if (recursive)
+				{
+					foreach (var baseTemplate in BaseTemplateList(baseTemplates.First(), sitecoreDataSource, true))
+					{
+						if (!list.Where(t => t.ID == baseTemplate.ID).Any())
+						{
+							//System.Diagnostics.Debugger.Launch();
+							//Console.WriteLine(baseTemplate.ID.ToString());
+							list.Add(baseTemplate);
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	return list;
+}
+
+#>
