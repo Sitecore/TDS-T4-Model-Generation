@@ -36,7 +36,6 @@ foreach (var template in sitecoreDataSource.Templates)
 #region <#= template.Name #> (<#= RelativeNamespace(template) #>)
 namespace <#= FullNamespace(template) #>
 {
-	// Template interface
 	public partial interface <#= InterfaceName(template.Name) #> : IItemWrapper <# 
 	foreach (var baseTemplate in baseTemplates)
 	{	
@@ -61,7 +60,6 @@ namespace <#= FullNamespace(template) #>
 #>			
 	}
 
-	// Template class
 	[TemplateMapping("<#= template.ID.ToString("b").ToUpper() #>")]
 	public class <#= ClassName(template.Name) #> : BaseItemWrapper, <#= InterfaceName(template.Name) #>
 	{
@@ -83,7 +81,7 @@ namespace <#= FullNamespace(template) #>
 		{
 			get 
 			{
-				return (<#= GetFieldWrapperType(field.Fields["type"]) #>)GetField("<#= field.Name.ToLower() #>"); 
+				return (<#= GetFieldWrapperType(field.Fields["type"]) #>)GetField("<#= field.ID.ToString() #>"); 
 			} 
 		} 	
 <#

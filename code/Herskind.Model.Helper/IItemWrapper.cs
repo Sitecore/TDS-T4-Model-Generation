@@ -11,6 +11,7 @@ namespace Herskind.Model.Helper
         string LanguageName { get; }
         string ItemLocation { get; }
         string ItemName { get; }
+        string ItemId { get; }
 
         void SaveChanges();
         string GenerateUrl();

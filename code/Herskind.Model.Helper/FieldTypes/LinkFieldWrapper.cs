@@ -11,7 +11,7 @@ namespace Herskind.Model.Helper.FieldTypes
     {
         public LinkFieldWrapper(Field field) : base(field) 
         {
-            
+
         }
 
         public string RenderAroundHtml(string innerHTML)
@@ -24,6 +24,17 @@ namespace Herskind.Model.Helper.FieldTypes
             var result = fieldRenderer.RenderField();
 
             return result.FirstPart + innerHTML + result.LastPart;
+        }
+
+
+        public T GetTarget<T>() where T : IItemWrapper
+        {
+            if (_field.TypeKey == "droplink")
+            {
+                var reference = new LookupField(_field);
+                return ItemFactory.Instance.SelectSinglePath<T>(reference.TargetID.ToString());
+            }
+            return default(T);
         }
     }
 }

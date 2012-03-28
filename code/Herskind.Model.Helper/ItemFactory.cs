@@ -38,10 +38,24 @@ namespace Herskind.Model.Helper
             return (T)((wrapper is T) ? wrapper : null);
         }
 
+        public T SelectSinglePath<T>(string path, IItemWrapper context) where T : IItemWrapper
+        {
+            // TODO: Ensure item exists
+            var item = ((Item)context.Original).Axes.SelectSingleItem(path);
+            var wrapper = SpawnTypeFromItem(item);
+            return (T)((wrapper is T) ? wrapper : null);
+        }
+
         public IEnumerable<T> SelectPath<T>(string path) where T : IItemWrapper
         {
             // TODO: Ensure item exists
             var items = Sitecore.Context.Database.SelectItems(path);
+            return FilterWrapperTypes<T>(SpawnTypeFromItemList(items));
+        }
+
+        public IEnumerable<T> SelectPath<T>(string path, IItemWrapper context) where T : IItemWrapper
+        {
+            var items = ((Item)context.Original).Axes.SelectItems(path);
             return FilterWrapperTypes<T>(SpawnTypeFromItemList(items));
         }
 
@@ -61,27 +75,38 @@ namespace Herskind.Model.Helper
 
         private IEnumerable<IItemWrapper> SpawnTypeFromItemList(IEnumerable<Item> items)
         {
-            return items.Select(i => SpawnTypeFromItem(i));
+            if (items != null)
+            {
+                return items.Select(i => SpawnTypeFromItem(i));
+            }
+            return new List<IItemWrapper>();
         }
 
         private IEnumerable<T> FilterWrapperTypes<T>(IEnumerable<IItemWrapper> wrappers)
         {
-            return (IEnumerable<T>)(wrappers.Where(w => w is T));
+            foreach(var wrapper in wrappers.Where(w => w is T).ToList())
+            {
+                yield return (T)wrapper;
+            }
         }
 
         private IItemWrapper SpawnTypeFromItem(Item item)
         {
-            var id = item.TemplateID.ToString();
-            if (TemplateMap.Keys.Contains(id))
+            if (item != null)
             {
-                // Get type information
-                var type = TemplateMap[id];
-                // Get public constructors
-                var ctors = type.GetConstructors();
-                // Invoke the first public constructor with no parameters.
-                return (IItemWrapper)ctors[0].Invoke(new object[] { item });
+                var id = item.TemplateID.ToString();
+                if (TemplateMap.Keys.Contains(id))
+                {
+                    // Get type information
+                    var type = TemplateMap[id];
+                    // Get public constructors
+                    var ctors = type.GetConstructors();
+                    // Invoke the first public constructor with no parameters.
+                    return (IItemWrapper)ctors[0].Invoke(new object[] { item });
+                }
+                return new BaseItemWrapper(item);
             }
-            return new BaseItemWrapper(item);
+            return null;
         }
 
         private Dictionary<string, Type> _templateMap = null;
@@ -92,15 +117,25 @@ namespace Herskind.Model.Helper
                 if (_templateMap == null)
                 {
                     _templateMap = new Dictionary<string, Type>();
-                    var assembly = System.Reflection.Assembly.GetCallingAssembly();
-                    foreach (Type t in assembly.GetTypes())
+
+                    foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
                     {
-                        foreach (TemplateMappingAttribute templateAttribute in t.GetCustomAttributes(typeof(TemplateMappingAttribute), false))
+                        try
                         {
-                            if (!_templateMap.Keys.Contains(templateAttribute.Id))
+                            foreach (Type t in assembly.GetTypes())
                             {
-                                _templateMap.Add(templateAttribute.Id, t);
+                                foreach (TemplateMappingAttribute templateAttribute in t.GetCustomAttributes(typeof(TemplateMappingAttribute), false))
+                                {
+                                    if (!_templateMap.Keys.Contains(templateAttribute.Id))
+                                    {
+                                        _templateMap.Add(templateAttribute.Id, t);
+                                    }
+                                }
                             }
+                        }
+                        catch
+                        {
+                            // Log error
                         }
                     }
                 }

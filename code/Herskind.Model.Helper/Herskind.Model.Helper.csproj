@@ -62,6 +62,7 @@
     <Compile Include="IFieldWrapper.cs" />
     <Compile Include="IItemFactory.cs" />
     <Compile Include="IItemWrapper.cs" />
+    <Compile Include="FieldTypes\ImageFieldWrapper.cs" />
     <Compile Include="ItemFactory.cs" />
     <Compile Include="IWrapper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

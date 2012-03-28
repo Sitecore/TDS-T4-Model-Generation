@@ -26,7 +26,7 @@ namespace Herskind.Model.Helper
                             _fields[key] = new BooleanFieldWrapper(scField);
                             break;
                         case "image":
-                            _fields[key] = null;
+                            _fields[key] = new ImageFieldWrapper(scField);
                             // TODO: image
                             //return null;
                             break;
@@ -77,6 +77,10 @@ namespace Herskind.Model.Helper
         {
             get { return _item.Name; }
         }
+        public string ItemId
+        {
+            get { return _item.ID.ToString(); }
+        }
 
         public string LanguageName
         {
@@ -113,7 +117,7 @@ namespace Herskind.Model.Helper
             return Sitecore.Links.LinkManager.GetItemUrl(_item, options);
         }
 
-        public IEnumerable<T> SelectChildren<T>() where T : IItemWrapper 
+        public IEnumerable<T> SelectChildren<T>() where T : IItemWrapper
         {
             IItemFactory factory = ItemFactory.Instance;
             return factory.SelectChildrenOfPath<T>(this._item.ID.ToString());

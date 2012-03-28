@@ -7,7 +7,6 @@ using Herskind.Model.Helper.FieldTypes;
 #region Sample Item (Sample)
 namespace Herskind.Model.Sample
 {
-	// Template interface
 	public partial interface ISampleItem : IItemWrapper 
 	{		
 		ITextFieldWrapper Text { get; }		
@@ -15,7 +14,6 @@ namespace Herskind.Model.Sample
 			
 	}
 
-	// Template class
 	[TemplateMapping("{76036F5E-CBCE-46D1-AF0A-4143F9B557AA}")]
 	public class SampleItem : BaseItemWrapper, ISampleItem
 	{
@@ -29,7 +27,7 @@ namespace Herskind.Model.Sample
 		{
 			get 
 			{
-				return (ITextFieldWrapper)GetField("text"); 
+				return (ITextFieldWrapper)GetField("a60acd61-a6db-4182-8329-c957982cec74"); 
 			} 
 		} 	
 
@@ -37,7 +35,7 @@ namespace Herskind.Model.Sample
 		{
 			get 
 			{
-				return (ITextFieldWrapper)GetField("title"); 
+				return (ITextFieldWrapper)GetField("75577384-3c97-45da-a847-81b00500e250"); 
 			} 
 		} 	
 	}

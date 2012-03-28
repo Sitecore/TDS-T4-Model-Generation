@@ -5,6 +5,7 @@ using System.Text;
 using Herskind.Model;
 using Sitecore.Data.Fields;
 using Sitecore.Data.Items;
+using Sitecore.Web.UI.WebControls;
 
 namespace Herskind.Model.Helper.FieldTypes
 {
@@ -17,7 +18,7 @@ namespace Herskind.Model.Helper.FieldTypes
 
         public string Render(string dateFormat)
         {
-            throw new NotImplementedException();
+            return FieldRenderer.Render(_field.Item, _field.Key, "format="+dateFormat);
         }
 
         public DateTime Date
