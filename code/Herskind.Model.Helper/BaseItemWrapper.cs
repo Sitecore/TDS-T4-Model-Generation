@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Sitecore.Data;
 using Sitecore.Data.Items;
 using Herskind.Model.Helper.FieldTypes;
 
@@ -19,53 +20,30 @@ namespace Herskind.Model.Helper
             {
                 try
                 {
-                    var scField = _item.Fields[key];
-                    switch (scField.Type.ToLower())
+                    var scField = _item.Fields[ID.Parse(key)];
+                    if (ItemFactory.FieldWrapperInterfaceMap.ContainsKey(scField.Type.ToLower()))
                     {
-                        case "checkbox":
-                            _fields[key] = new BooleanFieldWrapper(scField);
-                            break;
-                        case "image":
-                            _fields[key] = new ImageFieldWrapper(scField);
-                            // TODO: image
-                            //return null;
-                            break;
-                        case "date":
-                        case "datetime":
-                            _fields[key] = new DateFieldWrapper(scField);
-                            break;
-                        case "checklist":
-                        case "treelist":
-                        case "treelistex":
-                        case "multilist":
-                            _fields[key] = new ListFieldWrapper(scField);
-                            break;
-                        case "droplink":
-                        case "droptree":
-                        case "general link":
-                            _fields[key] = new LinkFieldWrapper(scField);
-                            break;
-                        case "single-line text":
-                        case "multi-line text":
-                        case "rich text":
-                            _fields[key] = new TextFieldWrapper(scField);
-                            break;
-                        default:
-                            _fields[key] = null;
-                            break;
+                        _fields[key] = this.ItemFactory.TypeContainer.ResolveFieldWrapper(ItemFactory.FieldWrapperInterfaceMap[scField.Type.ToLower()]);
+                        _fields[key].Original = scField;
+                        _fields[key].ItemFactory = ItemFactory;
                     }
                 }
                 catch (Exception ex)
                 {
-                    // Todo: Log error
+                    Sitecore.Diagnostics.Log.Error("Error instantiating field wrapper", ex, this);
                 }
             }
             return _fields[key];
         }
 
-        public BaseItemWrapper(Item item)
+        public BaseItemWrapper()
         {
-            _item = item;
+        }
+
+        public IItemFactory ItemFactory
+        {
+            get;
+            set;
         }
 
         public string DatabaseName
@@ -103,6 +81,7 @@ namespace Herskind.Model.Helper
         public object Original
         {
             get { return _item; }
+            set { _item = value as Item; }
         }
 
         public string GenerateUrl()
@@ -119,8 +98,7 @@ namespace Herskind.Model.Helper
 
         public IEnumerable<T> SelectChildren<T>() where T : IItemWrapper
         {
-            IItemFactory factory = ItemFactory.Instance;
-            return factory.SelectChildrenOfPath<T>(this._item.ID.ToString());
+            return ItemFactory.SelectChildrenOfPath<T>(this._item.ID.ToString());
         }
     }
 }

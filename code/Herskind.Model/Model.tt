@@ -12,6 +12,7 @@
 <#@ import namespace="System.Text" #>
 <#@ import namespace="System.Text.RegularExpressions" #>
 using System;
+using System.Collections.Generic;
 using Sitecore.Data.Items;
 using Herskind.Model.Helper;
 using Herskind.Model.Helper.FieldTypes;
@@ -20,7 +21,7 @@ using Herskind.Model.Helper.FieldTypes;
 // CONFIGURE: Change this to the the path of your TDS project (relative to current project)
 string tdsPath = "..\\Herskind.Model.Tds";
 // CONFIGURE: Choose your namespace prefix
-BaseNameSpace = "Herskind.Model";
+//BaseNamespace = "Herskind.Model";
 
 SerializedTreeDataSource sitecoreDataSource = new SerializedTreeDataSource(this.Host.ResolvePath(tdsPath));
 
@@ -60,14 +61,17 @@ namespace <#= FullNamespace(template) #>
 #>			
 	}
 
-	[TemplateMapping("<#= template.ID.ToString("b").ToUpper() #>")]
+	[TemplateMapping("<#= template.ID.ToString("b").ToUpper() #>", typeof(<#= InterfaceName(template.Name) #>))]
 	public class <#= ClassName(template.Name) #> : BaseItemWrapper, <#= InterfaceName(template.Name) #>
 	{
 		private Item _innerItem = null;
-		public <#= ClassName(template.Name) #>(Item item) : base(item)
-		{
-			_innerItem = item;
-		}
+		public <#= ClassName(template.Name) #>()
+        {
+        }
+//		public <#= ClassName(template.Name) #>(Item item) : base(item)
+//		{
+//			_innerItem = item;
+//		}
 <#
 	foreach(var fieldTemplate in combinedTemplateList)
 	{		
@@ -81,7 +85,7 @@ namespace <#= FullNamespace(template) #>
 		{
 			get 
 			{
-				return (<#= GetFieldWrapperType(field.Fields["type"]) #>)GetField("<#= field.ID.ToString() #>"); 
+				return (<#= GetFieldWrapperType(field.Fields["type"]) #>)GetField("<#= field.ID #>"); 
 			} 
 		} 	
 <#
@@ -93,51 +97,54 @@ namespace <#= FullNamespace(template) #>
 	}
 }
 #endregion
-
 <#
 }
 #>
+
+namespace <#= BaseNamespace #>
+{
+	public static class FieldWrapperInterfaceMap
+	{
+		public static Dictionary<string, Type> Mappings = new Dictionary<string, Type>()
+		{
+<# foreach(var fieldMapping in FieldMappings) { #>
+			{"<#= fieldMapping.Key #>", typeof(<#= fieldMapping.Value #>)},
+<# } #>
+		};
+	}
+}
+
 <#+ 
-public string BaseNameSpace = "Herskind.Model";
+public string BaseNamespace = "Herskind.Model";
+
+public Dictionary<string, string> FieldMappings = new Dictionary<string,string>()
+{
+	{"checkbox", "IBooleanFieldWrapper"},
+	{"image", "IImageFieldWrapper"},
+	{"date", "IDateFieldWrapper"},
+	{"datetime", "IDateFieldWrapper"},
+	{"checklist","IListFieldWrapper"},
+	{"treelist","IListFieldWrapper"},
+	{"treelistex","IListFieldWrapper"},
+	{"multilist","IListFieldWrapper"},
+	{"droplink","ILinkFieldWrapper"},
+	{"droptree","ILinkFieldWrapper"},
+	{"general link","ILinkFieldWrapper"},
+	{"single-line text","ITextFieldWrapper"},
+	{"multi-line text","ITextFieldWrapper"},
+	{"rich text","ITextFieldWrapper"},
+	{"","ITextFieldWrapper"}
+};
+
 
 public string GetFieldWrapperType(string typeName)
 {
-	var wrapperType = "IFieldWrapper";
-	
-	switch (typeName.ToLower())
+	if (FieldMappings.ContainsKey(typeName.ToLower()))
     {
-        case "checkbox":
-            wrapperType = "IBooleanFieldWrapper";
-            break;
-        case "image":
-            wrapperType = "IImageFieldWrapper";
-            break;
-        case "date":
-        case "datetime":
-            wrapperType = "IDateFieldWrapper";
-            break;
-        case "checklist":
-        case "treelist":
-        case "treelistex":
-        case "multilist":
-            wrapperType = "IListFieldWrapper";
-            break;
-        case "droplink":
-        case "droptree":
-        case "general link":
-            wrapperType = "ILinkFieldWrapper";
-            break;
-        case "single-line text":
-        case "multi-line text":
-        case "rich text":
-		    wrapperType = "ITextFieldWrapper";
-            break;
-		default:
-            wrapperType = "ITextFieldWrapper";
-            break;
+		return FieldMappings[typeName.ToLower()];
     }
 
-	return wrapperType;
+	return FieldMappings[""];
 }
 
 
@@ -199,7 +206,7 @@ public string RelativeNamespace(TemplateItem template)
 
 public string FullNamespace(TemplateItem template)
 {
-	return BaseNameSpace + "." + RelativeNamespace(template);
+	return BaseNamespace + "." + RelativeNamespace(template);
 }
 
 public IEnumerable<TemplateItem> BaseTemplateList(TemplateItem template, SerializedTreeDataSource sitecoreDataSource, bool recursive)
@@ -232,5 +239,4 @@ public IEnumerable<TemplateItem> BaseTemplateList(TemplateItem template, Seriali
 	
 	return list;
 }
-
 #>

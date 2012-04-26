@@ -8,11 +8,6 @@ namespace Herskind.Model.Helper.FieldTypes
 {
     public class BooleanFieldWrapper : BaseFieldWrapper, IBooleanFieldWrapper
     {
-        public BooleanFieldWrapper(Field field)
-            : base(field)
-        {
-        }
-
         public bool Boolean
         {
             get

@@ -7,6 +7,7 @@ namespace Herskind.Model.Helper
 {
     public interface IWrapper
     {
-        object Original { get; }
+        object Original { get; set; }
+        IItemFactory ItemFactory { get; set; }
     }
 }

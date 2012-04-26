@@ -11,11 +11,6 @@ namespace Herskind.Model.Helper.FieldTypes
 {
     public class DateFieldWrapper : BaseFieldWrapper, IDateFieldWrapper
     {
-        public DateFieldWrapper(Field field)
-            : base(field)
-        { 
-        }
-
         public string Render(string dateFormat)
         {
             return FieldRenderer.Render(_field.Item, _field.Key, "format="+dateFormat);

@@ -9,11 +9,6 @@ namespace Herskind.Model.Helper.FieldTypes
 {
     public class LinkFieldWrapper : BaseFieldWrapper, ILinkFieldWrapper
     {
-        public LinkFieldWrapper(Field field) : base(field) 
-        {
-
-        }
-
         public string RenderAroundHtml(string innerHTML)
         {
             var fieldRenderer = new FieldRenderer();
@@ -32,7 +27,7 @@ namespace Herskind.Model.Helper.FieldTypes
             if (_field.TypeKey == "droplink")
             {
                 var reference = new LookupField(_field);
-                return ItemFactory.Instance.SelectSinglePath<T>(reference.TargetID.ToString());
+                return ItemFactory.SelectSinglePath<T>(reference.TargetID.ToString());
             }
             return default(T);
         }

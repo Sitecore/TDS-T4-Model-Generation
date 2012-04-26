@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Sitecore.Data.Items;
 
 namespace Herskind.Model.Helper
 {
-    public interface IFieldClusterWrapper
+    public interface ISitecoreProvider
     {
-
+        Item GetContextItem();
     }
 }

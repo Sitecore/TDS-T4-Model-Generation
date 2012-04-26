@@ -9,19 +9,55 @@ namespace Herskind.Model.Helper
 {
     public class ItemFactory : IItemFactory
     {
-        private static ItemFactory _instance;
-        public static IItemFactory Instance
+        public IContainerProvider TypeContainer { get; set; }
+        public ISitecoreProvider SitecoreProvider { get; set; }
+        public IDictionary<string, Type> FieldWrapperInterfaceMap { get; set; }
+        public IDictionary<string, Type> ItemWrapperInterfaceMap { get; set; }
+
+        public ItemFactory()
         {
-            get
-            {
-                if (_instance == null)
-                {
-                    _instance = new ItemFactory();
-                }
-                return _instance;
-            }
         }
 
+        public ItemFactory(IContainerProvider typeContainer, IDictionary<string, Type> fieldWrapperInterfaceMap, string itemWrapperAssemblyFilter)
+        {
+            this.TypeContainer = typeContainer;
+            this.FieldWrapperInterfaceMap = fieldWrapperInterfaceMap;
+            this.ItemWrapperInterfaceMap = new Dictionary<string, Type>();
+
+            RegisterTemplateMappings(itemWrapperAssemblyFilter);
+            RegisterDefaultFieldTypes();
+        }
+
+        protected virtual void RegisterDefaultFieldTypes()
+        {
+            TypeContainer.RegisterFieldWrapper(typeof(FieldTypes.IBooleanFieldWrapper), typeof(FieldTypes.BooleanFieldWrapper));
+            TypeContainer.RegisterFieldWrapper(typeof(FieldTypes.IDateFieldWrapper), typeof(FieldTypes.DateFieldWrapper));
+            TypeContainer.RegisterFieldWrapper(typeof(FieldTypes.IImageFieldWrapper), typeof(FieldTypes.ImageFieldWrapper));
+            TypeContainer.RegisterFieldWrapper(typeof(FieldTypes.ILinkFieldWrapper), typeof(FieldTypes.LinkFieldWrapper));
+            TypeContainer.RegisterFieldWrapper(typeof(FieldTypes.IListFieldWrapper), typeof(FieldTypes.ListFieldWrapper));
+            TypeContainer.RegisterFieldWrapper(typeof(FieldTypes.ITextFieldWrapper), typeof(FieldTypes.TextFieldWrapper));
+        }
+
+        protected virtual void RegisterTemplateMappings(string assemblyFilter)
+        {
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                if (assembly.FullName.StartsWith(assemblyFilter))
+                {
+                    foreach (Type t in assembly.GetTypes())
+                    {
+                        foreach (TemplateMappingAttribute templateAttribute in t.GetCustomAttributes(typeof(TemplateMappingAttribute), false))
+                        {
+                            if (!ItemWrapperInterfaceMap.ContainsKey(templateAttribute.Id))
+                            {
+                                ItemWrapperInterfaceMap.Add(templateAttribute.Id, templateAttribute.Interface);
+                                TypeContainer.RegisterItemWrapper(templateAttribute.Interface, t);
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
         public IEnumerable<T> SelectChildrenOfPath<T>(string path) where T : IItemWrapper
         {
@@ -68,7 +104,7 @@ namespace Herskind.Model.Helper
 
         public T GetContextItem<T>() where T : IItemWrapper
         {
-            var item = Sitecore.Context.Item;
+            var item = SitecoreProvider.GetContextItem();
             var wrapper = SpawnTypeFromItem(item);
             return (T)((wrapper is T) ? wrapper : null);
         }
@@ -94,54 +130,50 @@ namespace Herskind.Model.Helper
         {
             if (item != null)
             {
-                var id = item.TemplateID.ToString();
-                if (TemplateMap.Keys.Contains(id))
+                if (ItemWrapperInterfaceMap.ContainsKey(item.TemplateID.ToString()))
                 {
-                    // Get type information
-                    var type = TemplateMap[id];
-                    // Get public constructors
-                    var ctors = type.GetConstructors();
-                    // Invoke the first public constructor with no parameters.
-                    return (IItemWrapper)ctors[0].Invoke(new object[] { item });
+                    var itemWrapper = TypeContainer.ResolveItemWrapper(ItemWrapperInterfaceMap[item.TemplateID.ToString()]);
+                    itemWrapper.Original = item;
+                    itemWrapper.ItemFactory = this;
+                    return itemWrapper;
                 }
-                return new BaseItemWrapper(item);
             }
             return null;
         }
 
-        private Dictionary<string, Type> _templateMap = null;
-        private Dictionary<string, Type> TemplateMap 
-        {
-            get
-            {
-                if (_templateMap == null)
-                {
-                    _templateMap = new Dictionary<string, Type>();
+        //private Dictionary<string, Type> _templateMap = null;
+        //private Dictionary<string, Type> TemplateMap 
+        //{
+        //    get
+        //    {
+        //        if (_templateMap == null)
+        //        {
+        //            _templateMap = new Dictionary<string, Type>();
 
-                    foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
-                    {
-                        try
-                        {
-                            foreach (Type t in assembly.GetTypes())
-                            {
-                                foreach (TemplateMappingAttribute templateAttribute in t.GetCustomAttributes(typeof(TemplateMappingAttribute), false))
-                                {
-                                    if (!_templateMap.Keys.Contains(templateAttribute.Id))
-                                    {
-                                        _templateMap.Add(templateAttribute.Id, t);
-                                    }
-                                }
-                            }
-                        }
-                        catch
-                        {
-                            // Log error
-                        }
-                    }
-                }
-                return _templateMap;
-            }
-        }
+        //            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+        //            {
+        //                try
+        //                {
+        //                    foreach (Type t in assembly.GetTypes())
+        //                    {
+        //                        foreach (TemplateMappingAttribute templateAttribute in t.GetCustomAttributes(typeof(TemplateMappingAttribute), false))
+        //                        {
+        //                            if (!_templateMap.Keys.Contains(templateAttribute.Id))
+        //                            {
+        //                                _templateMap.Add(templateAttribute.Id, t);
+        //                            }
+        //                        }
+        //                    }
+        //                }
+        //                catch
+        //                {
+        //                    // Log error
+        //                }
+        //            }
+        //        }
+        //        return _templateMap;
+        //    }
+        //}
     }
 }
     

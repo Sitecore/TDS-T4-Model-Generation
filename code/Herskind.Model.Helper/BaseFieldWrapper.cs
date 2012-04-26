@@ -11,13 +11,15 @@ namespace Herskind.Model.Helper
     {
         protected bool _modified = false;
         protected Sitecore.Data.Fields.Field _field;
+        protected IItemFactory _itemFactory;
 
-
-        public BaseFieldWrapper(Sitecore.Data.Fields.Field field)
-        {
-            Sitecore.Diagnostics.Assert.ArgumentNotNull(field, "field");
-            _field = field;
-        }
+        //public BaseFieldWrapper(Sitecore.Data.Fields.Field field, IItemFactory itemFactory)
+        //{
+        //    Sitecore.Diagnostics.Assert.ArgumentNotNull(field, "field");
+        //    Sitecore.Diagnostics.Assert.ArgumentNotNull(itemFactory, "itemFactory");
+        //    _field = field;
+        //    _itemFactory = itemFactory;
+        //}
 
         public string RawValue
         {
@@ -47,9 +49,16 @@ namespace Herskind.Model.Helper
             return FieldRenderer.Render(_field.Item, _field.Key, parameters);
         }
 
+        public IItemFactory ItemFactory
+        {
+            get;
+            set;
+        }
+
         public object Original
         {
             get { return _field; }
+            set { _field = value as Sitecore.Data.Fields.Field; }
         }
     }
 }

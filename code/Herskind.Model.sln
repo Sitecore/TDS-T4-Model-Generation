@@ -9,7 +9,21 @@ Project("{CAA73BB0-EF22-4D79-A57E-DF67B3BA9C80}") = "Herskind.Model.Tds", "Hersk
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Herskind.Model.Web", "Herskind.Model.Web\Herskind.Model.Web.csproj", "{40D26D08-E76C-41DF-B08C-83F7B3E97671}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Herskind.Model.Helper.Unity", "Herskind.Model.Helper.Unity\Herskind.Model.Helper.Unity.csproj", "{5EEC97FD-A784-4A0A-9EA9-D07F39CDBCB6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Herskind.Model.Tests", "Herskind.Model.Tests\Herskind.Model.Tests.csproj", "{DDD35194-CDFF-4D77-87EC-82D7D6673214}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F1CDE9DF-1E55-49B7-81BA-37651A01DE29}"
+	ProjectSection(SolutionItems) = preProject
+		Herskind.Model.vsmdi = Herskind.Model.vsmdi
+		Local.testsettings = Local.testsettings
+		TraceAndTestImpact.testsettings = TraceAndTestImpact.testsettings
+	EndProjectSection
+EndProject
 Global
+	GlobalSection(TestCaseManagementSettings) = postSolution
+		CategoryFile = Herskind.Model.vsmdi
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -33,6 +47,14 @@ Global
 		{40D26D08-E76C-41DF-B08C-83F7B3E97671}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{40D26D08-E76C-41DF-B08C-83F7B3E97671}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{40D26D08-E76C-41DF-B08C-83F7B3E97671}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5EEC97FD-A784-4A0A-9EA9-D07F39CDBCB6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5EEC97FD-A784-4A0A-9EA9-D07F39CDBCB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5EEC97FD-A784-4A0A-9EA9-D07F39CDBCB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5EEC97FD-A784-4A0A-9EA9-D07F39CDBCB6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DDD35194-CDFF-4D77-87EC-82D7D6673214}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DDD35194-CDFF-4D77-87EC-82D7D6673214}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DDD35194-CDFF-4D77-87EC-82D7D6673214}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DDD35194-CDFF-4D77-87EC-82D7D6673214}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

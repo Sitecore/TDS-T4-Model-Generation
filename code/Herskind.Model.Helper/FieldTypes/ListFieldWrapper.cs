@@ -9,11 +9,6 @@ namespace Herskind.Model.Helper.FieldTypes
 {
     public class ListFieldWrapper : BaseFieldWrapper, IListFieldWrapper
     {
-        public ListFieldWrapper(Field field)
-            : base(field)
-        { 
-        }
-
         public IEnumerable<IItemWrapper> Items
         {
             get

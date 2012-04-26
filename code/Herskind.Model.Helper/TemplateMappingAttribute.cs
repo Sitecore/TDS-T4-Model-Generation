@@ -10,10 +10,12 @@ namespace Herskind.Model.Helper
         public readonly string id;
 
         public string Id { get; set; }
+        public Type Interface { get; set; }
 
-        public TemplateMappingAttribute(string id)
+        public TemplateMappingAttribute(string id, Type interfaceType)
         {
             this.Id = id;
+            this.Interface = interfaceType;
         }
     }
 }
