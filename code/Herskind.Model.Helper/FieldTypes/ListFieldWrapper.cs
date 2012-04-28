@@ -17,7 +17,7 @@ namespace Herskind.Model.Helper.FieldTypes
                 var listField = (MultilistField)_field;
                 foreach (var id in listField.Items)
                 {
-                    yield return factory.SelectSinglePath<IItemWrapper>(id);
+                    yield return factory.Select<IItemWrapper>(id, null).First();
                 }
             }
         }

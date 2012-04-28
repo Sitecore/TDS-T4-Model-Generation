@@ -62,7 +62,6 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SampleItem.cs" />
-    <Compile Include="SitecoreProviderStub.cs" />
     <Compile Include="UnityTests.cs" />
   </ItemGroup>
   <ItemGroup>
