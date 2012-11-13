@@ -98,7 +98,12 @@ namespace Herskind.Model.Helper
 
         public IEnumerable<T> SelectChildren<T>() where T : IItemWrapper
         {
-            return ItemFactory.SelectChildrenOfPath<T>(this._item.ID.ToString());
+            var templateId = ItemFactory.ItemWrapperInterfaceMap.Where(keypair => keypair.Value == typeof(T)).Select(keypair => keypair.Key).FirstOrDefault();
+            if (!string.IsNullOrEmpty(templateId))
+            {
+                return ItemFactory.Select<T>("*[@@templateid='"+templateId+"']", this);
+            }
+            return new List<T>();
         }
     }
 }

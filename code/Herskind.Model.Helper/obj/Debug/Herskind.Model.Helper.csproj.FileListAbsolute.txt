@@ -1,9 +1,0 @@
-C:\Projects\Herskind - Copy\code\Herskind.Model.Helper\bin\Debug\Herskind.Model.Helper.dll
-C:\Projects\Herskind - Copy\code\Herskind.Model.Helper\bin\Debug\Herskind.Model.Helper.pdb
-C:\Projects\Herskind - Copy\code\Herskind.Model.Helper\bin\Debug\Sitecore.Kernel.dll
-C:\Projects\Herskind - Copy\code\Herskind.Model.Helper\bin\Debug\Lucene.Net.dll
-C:\Projects\Herskind - Copy\code\Herskind.Model.Helper\bin\Debug\Sitecore.Zip.dll
-C:\Projects\Herskind - Copy\code\Herskind.Model.Helper\bin\Debug\Sitecore.Logging.dll
-C:\Projects\Herskind - Copy\code\Herskind.Model.Helper\obj\Debug\ResolveAssemblyReference.cache
-C:\Projects\Herskind - Copy\code\Herskind.Model.Helper\obj\Debug\Herskind.Model.Helper.dll
-C:\Projects\Herskind - Copy\code\Herskind.Model.Helper\obj\Debug\Herskind.Model.Helper.pdb

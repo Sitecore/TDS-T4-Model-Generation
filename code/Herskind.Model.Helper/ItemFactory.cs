@@ -59,47 +59,12 @@ namespace Herskind.Model.Helper
             }
         }
 
-        public IEnumerable<T> SelectChildrenOfPath<T>(string path) where T : IItemWrapper
+        public T GetSiteHome<T>(IItemWrapper context) where T : IItemWrapper
         {
-            // TODO: Ensure item exists
-            var item = Sitecore.Context.Database.SelectSingleItem(path);
-            return FilterWrapperTypes<T>(SpawnTypeFromItemList(item.Children.AsEnumerable()));
-        }
-
-        public T SelectSinglePath<T>(string path) where T : IItemWrapper
-        {
-            // TODO: Ensure item exists
-            var item = Sitecore.Context.Database.SelectSingleItem(path);
+            var item = SitecoreProvider.GetSiteHome(context.Original as Item);
             var wrapper = SpawnTypeFromItem(item);
             return (T)((wrapper is T) ? wrapper : null);
-        }
 
-        public T SelectSinglePath<T>(string path, IItemWrapper context) where T : IItemWrapper
-        {
-            // TODO: Ensure item exists
-            var item = ((Item)context.Original).Axes.SelectSingleItem(path);
-            var wrapper = SpawnTypeFromItem(item);
-            return (T)((wrapper is T) ? wrapper : null);
-        }
-
-        public IEnumerable<T> SelectPath<T>(string path) where T : IItemWrapper
-        {
-            // TODO: Ensure item exists
-            var items = Sitecore.Context.Database.SelectItems(path);
-            return FilterWrapperTypes<T>(SpawnTypeFromItemList(items));
-        }
-
-        public IEnumerable<T> SelectPath<T>(string path, IItemWrapper context) where T : IItemWrapper
-        {
-            var items = ((Item)context.Original).Axes.SelectItems(path);
-            return FilterWrapperTypes<T>(SpawnTypeFromItemList(items));
-        }
-
-        public T GetSiteHome<T>() where T : IItemWrapper
-        {
-            var item = Sitecore.Context.Database.GetItem(Sitecore.Context.Site.StartPath);
-            var wrapper = SpawnTypeFromItem(item);
-            return (T)((wrapper is T) ? wrapper : null);
         }
 
         public T GetContextItem<T>() where T : IItemWrapper
@@ -107,6 +72,13 @@ namespace Herskind.Model.Helper
             var item = SitecoreProvider.GetContextItem();
             var wrapper = SpawnTypeFromItem(item);
             return (T)((wrapper is T) ? wrapper : null);
+        }
+
+
+        public IEnumerable<T> Select<T>(string query, IItemWrapper context) where T : IItemWrapper
+        {
+            var items = SitecoreProvider.SelectItems(query, context.Original as Item);
+            return FilterWrapperTypes<T>(SpawnTypeFromItemList(items));
         }
 
         private IEnumerable<IItemWrapper> SpawnTypeFromItemList(IEnumerable<Item> items)
@@ -140,40 +112,6 @@ namespace Herskind.Model.Helper
             }
             return null;
         }
-
-        //private Dictionary<string, Type> _templateMap = null;
-        //private Dictionary<string, Type> TemplateMap 
-        //{
-        //    get
-        //    {
-        //        if (_templateMap == null)
-        //        {
-        //            _templateMap = new Dictionary<string, Type>();
-
-        //            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
-        //            {
-        //                try
-        //                {
-        //                    foreach (Type t in assembly.GetTypes())
-        //                    {
-        //                        foreach (TemplateMappingAttribute templateAttribute in t.GetCustomAttributes(typeof(TemplateMappingAttribute), false))
-        //                        {
-        //                            if (!_templateMap.Keys.Contains(templateAttribute.Id))
-        //                            {
-        //                                _templateMap.Add(templateAttribute.Id, t);
-        //                            }
-        //                        }
-        //                    }
-        //                }
-        //                catch
-        //                {
-        //                    // Log error
-        //                }
-        //            }
-        //        }
-        //        return _templateMap;
-        //    }
-        //}
     }
 }
     
