@@ -15,10 +15,10 @@ namespace Herskind.Model.Helper
         {
             get
             {
-                if (_database != null)
-                {
-                    return _database;
-                }
+                //if (_database != null)
+                //{
+                //    return _database;
+                //}
                 return Sitecore.Context.Database;
             }
         }

@@ -77,7 +77,7 @@ namespace Herskind.Model.Helper
 
         public IEnumerable<T> Select<T>(string query, IItemWrapper context) where T : IItemWrapper
         {
-            var items = SitecoreProvider.SelectItems(query, context.Original as Item);
+            var items = (context == null) ? SitecoreProvider.SelectItems(query, null) : SitecoreProvider.SelectItems(query, context.Original as Item);
             return FilterWrapperTypes<T>(SpawnTypeFromItemList(items));
         }
 
