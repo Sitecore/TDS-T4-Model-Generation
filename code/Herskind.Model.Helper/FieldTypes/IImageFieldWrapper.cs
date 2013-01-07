@@ -7,7 +7,6 @@ namespace Herskind.Model.Helper.FieldTypes
 {
     public interface IImageFieldWrapper : IFieldWrapper
     {
-        string Render(int width, int height, bool crop);
-        string Render(int width, int height, bool crop, string cssClass);
+
     }
 }

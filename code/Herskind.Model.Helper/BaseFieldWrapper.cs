@@ -34,17 +34,22 @@ namespace Herskind.Model.Helper
             }
         }
 
+        public override string ToString()
+        {
+            return RenderField();
+        }
+
         public bool IsModified
         {
             get { return _modified; }
         }
 
-        public string Render()
+        public string RenderField()
         {
             return FieldRenderer.Render(_field.Item, _field.Key);
         }
 
-        public string Render(string parameters)
+        public string RenderField(string parameters)
         {
             return FieldRenderer.Render(_field.Item, _field.Key, parameters);
         }

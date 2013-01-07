@@ -9,6 +9,7 @@ namespace Herskind.Model.Helper
     {
         string RawValue { get; set; }
         bool IsModified { get; }
-        string Render();
+        string RenderField();
+        string RenderField(string parameters);
     }
 }
