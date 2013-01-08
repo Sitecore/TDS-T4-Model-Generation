@@ -62,7 +62,7 @@ namespace Herskind.Model.Helper
         public T GetSiteHome<T>(IItemWrapper context) where T : IItemWrapper
         {
             var item = SitecoreProvider.GetSiteHome(context.Original as Item);
-            var wrapper = SpawnTypeFromItem(item);
+            var wrapper = SpawnNullableTypeFromItem(item, typeof(T));
             return (T)((wrapper is T) ? wrapper : null);
 
         }
@@ -70,7 +70,7 @@ namespace Herskind.Model.Helper
         public T GetContextItem<T>() where T : IItemWrapper
         {
             var item = SitecoreProvider.GetContextItem();
-            var wrapper = SpawnTypeFromItem(item);
+            var wrapper = SpawnNullableTypeFromItem(item, typeof(T));
             return (T)((wrapper is T) ? wrapper : null);
         }
 
@@ -98,6 +98,19 @@ namespace Herskind.Model.Helper
             }
         }
 
+        private IItemWrapper SpawnNullableTypeFromItem(Item item, Type t)
+        {
+            if (item != null)
+            {
+                return SpawnTypeFromItem(item);
+            }
+            else
+            {
+                return SpawnTypeNullItem(t);
+            }
+            return null;
+        }
+
         private IItemWrapper SpawnTypeFromItem(Item item)
         {
             if (item != null)
@@ -111,6 +124,13 @@ namespace Herskind.Model.Helper
                 }
             }
             return null;
+        }
+
+        private IItemWrapper SpawnTypeNullItem(Type t)
+        {
+            var itemWrapper = TypeContainer.ResolveItemWrapper(t);
+            itemWrapper.ItemFactory = this;
+            return itemWrapper;
         }
     }
 }
