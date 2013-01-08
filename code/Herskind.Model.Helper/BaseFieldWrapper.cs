@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Web;
 using Sitecore.Web.UI.WebControls;
 using Herskind.Model.Helper.FieldTypes;
 
 namespace Herskind.Model.Helper
 {
-    public class BaseFieldWrapper : IFieldWrapper
+    public class BaseFieldWrapper : IHtmlString, IFieldWrapper
     {
         protected bool _modified = false;
         protected Sitecore.Data.Fields.Field _field;
@@ -35,6 +36,11 @@ namespace Herskind.Model.Helper
         }
 
         public override string ToString()
+        {
+            return RenderField();
+        }
+       
+        public string  ToHtmlString()
         {
             return RenderField();
         }
