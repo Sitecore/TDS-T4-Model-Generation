@@ -15,5 +15,6 @@ namespace Herskind.Model.Helper
         T GetContextItem<T>() where T : IItemWrapper;
         T GetSiteHome<T>(IItemWrapper context) where T : IItemWrapper;
         IEnumerable<T> Select<T>(string query, IItemWrapper context) where T : IItemWrapper;
+        T SelectSingle<T>(string query, IItemWrapper context) where T : IItemWrapper;
     }
 }

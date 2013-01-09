@@ -27,7 +27,7 @@ namespace Herskind.Model.Helper.FieldTypes
             if (_field.TypeKey == "droplink")
             {
                 var reference = new LookupField(_field);
-                return ItemFactory.Select<T>(reference.TargetID.ToString(), null).FirstOrDefault();
+                return ItemFactory.SelectSingle<T>(reference.TargetID.ToString(), null);;
             }
             return default(T);
         }

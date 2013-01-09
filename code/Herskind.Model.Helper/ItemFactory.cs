@@ -81,11 +81,20 @@ namespace Herskind.Model.Helper
             return FilterWrapperTypes<T>(SpawnTypeFromItemList(items));
         }
 
+        public T SelectSingle<T>(string query, IItemWrapper context) where T : IItemWrapper
+        {
+            var items = (context == null) ? SitecoreProvider.SelectItems(query, null) : SitecoreProvider.SelectItems(query, context.Original as Item);
+            if (items == null || items.Count() == 0)
+                return (T)SpawnNullableTypeFromItem(null, typeof(T));
+            else
+                return (T)SpawnNullableTypeFromItem(items.First(), typeof(T));
+        }
+
         private IEnumerable<IItemWrapper> SpawnTypeFromItemList(IEnumerable<Item> items)
         {
             if (items != null)
             {
-                return items.Select(i => SpawnTypeFromItem(i));
+                return items.Select(i => SpawnTypeFromItem(i)).Where(w => w != null);
             }
             return new List<IItemWrapper>();
         }
@@ -108,7 +117,6 @@ namespace Herskind.Model.Helper
             {
                 return SpawnTypeNullItem(t);
             }
-            return null;
         }
 
         private IItemWrapper SpawnTypeFromItem(Item item)

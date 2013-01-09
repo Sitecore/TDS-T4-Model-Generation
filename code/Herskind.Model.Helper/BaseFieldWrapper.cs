@@ -26,7 +26,11 @@ namespace Herskind.Model.Helper
         {
             get
             {
-                return _field.Value;
+                if (_field != null)
+                {
+                    return _field.Value;
+                }
+                return "";
             }
             set
             {
@@ -52,12 +56,20 @@ namespace Herskind.Model.Helper
 
         public string RenderField()
         {
-            return FieldRenderer.Render(_field.Item, _field.Key);
+            if (_field != null)
+            {
+                return FieldRenderer.Render(_field.Item, _field.Key);
+            }
+            return "";
         }
 
         public string RenderField(string parameters)
         {
-            return FieldRenderer.Render(_field.Item, _field.Key, parameters);
+            if (_field != null)
+            {
+                return FieldRenderer.Render(_field.Item, _field.Key, parameters);
+            }
+            return "";
         }
 
         public IItemFactory ItemFactory

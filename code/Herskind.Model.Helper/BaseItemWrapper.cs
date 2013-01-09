@@ -13,18 +13,26 @@ namespace Herskind.Model.Helper
         protected Item _item;
         protected Dictionary<string, IFieldWrapper> _fields = new Dictionary<string,IFieldWrapper>();
 
-        protected IFieldWrapper GetField(string key)
+        protected T GetField<T>(string key)
         {
             key = key.ToLower();
             if (!_fields.Keys.Contains(key))
             {
                 try
                 {
-                    var scField = _item.Fields[ID.Parse(key)];
-                    if (ItemFactory.FieldWrapperInterfaceMap.ContainsKey(scField.Type.ToLower()))
+                    if (_item != null)
                     {
-                        _fields[key] = this.ItemFactory.TypeContainer.ResolveFieldWrapper(ItemFactory.FieldWrapperInterfaceMap[scField.Type.ToLower()]);
-                        _fields[key].Original = scField;
+                        var scField = _item.Fields[ID.Parse(key)];
+                        if (ItemFactory.FieldWrapperInterfaceMap.ContainsKey(scField.Type.ToLower()))
+                        {
+                            _fields[key] = this.ItemFactory.TypeContainer.ResolveFieldWrapper(ItemFactory.FieldWrapperInterfaceMap[scField.Type.ToLower()]);
+                            _fields[key].Original = scField;
+                            _fields[key].ItemFactory = ItemFactory;
+                        }
+                    }
+                    else
+                    {
+                        _fields[key] = this.ItemFactory.TypeContainer.ResolveFieldWrapper(typeof(T));
                         _fields[key].ItemFactory = ItemFactory;
                     }
                 }
@@ -33,7 +41,7 @@ namespace Herskind.Model.Helper
                     Sitecore.Diagnostics.Log.Error("Error instantiating field wrapper", ex, this);
                 }
             }
-            return _fields[key];
+            return (T)_fields[key];
         }
 
         public BaseItemWrapper()
